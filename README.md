@@ -1,2 +1,2 @@
 # SchemeGeneration
-All information about project in file Documeentation.pdf in branch dev
+All information about project in file Documentation.pdf in branch dev
