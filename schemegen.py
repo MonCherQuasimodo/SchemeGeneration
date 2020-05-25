@@ -3,27 +3,58 @@ from flask import render_template
 from flask import url_for
 from flask import redirect
 from flask import request
+from flask import send_file
 
 from PIL import Image
 
-from random import choices
+from fpdf import FPDF
 
-import numpy
+import matplotlib.pyplot as plt
+
+from random import choices
 
 import os
 import sys
 
+import schemcomp
+
 app = Flask(__name__)
 
+PATHS = {
+    "IMAGE_UPLOADS": os.getcwd() + "/static/img/uploads/",
+    "SCHEMES": os.getcwd() + "/static/img/schemes/",
+    "PALETTES": os.getcwd() + "/static/img/palettes/"
+}
 
-app.config["IMAGE_UPLOADS"] = os.getcwd() + "/static/img/uploads/"
-app.config["SCHEMES"] = os.getcwd() + "/static/img/schemes/"
-last_file = ""
+PDF_PATH = os.getcwd() + "/static/pdf/"
+
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+IMAGE_NAME = 'IMAGE_'
+
+id = 0
+ext = ""
+
+fig = plt.figure()
+
+
+def get_filename(extension='native'):
+    filename = IMAGE_NAME + str(id)
+    filename += ext if extension == 'native' else extension
+    return filename
+
+
+def create_sending_file():
+    pdf = FPDF()
+    for i in PATHS.values():
+        pdf.add_page()
+        pdf.image(i + get_filename(), x=0, y=0, w=210)
+    pdf.output(dest="F", name=PDF_PATH + get_filename('.pdf'))
 
 
 # ___________________________Web_part__________________________________ #
 @app.route('/')
-def hello_world():
+def main_page():
     return render_template('schemegen.html')
 
 
@@ -32,68 +63,50 @@ def upload_image():
     if request.method == "POST":
         if request.files:
             image = request.files['image']
-            global last_file
-            last_file = image.filename
-            image.save(os.path.join(app.config["IMAGE_UPLOADS"],
-                                    image.filename))
-            convert_image(image.filename)
+            global id
+            global ext
+            ext = os.path.splitext(image.filename)[1]
+            id += 1
+            image.save(os.path.join(PATHS["IMAGE_UPLOADS"],
+                                    get_filename()))
+            try:
+                schemcomp.computing(get_filename(),
+                                    int(request.form.get('diagonal')),
+                                    request.form.get('palette').lower(),
+                                    float(request.form.get('density')),
+                                    request.form.get('mod'),
+                                    fig)
+            except:
+                return redirect(url_for('error_page'))
             return redirect(request.url)
-
     return redirect(url_for('scheme_page'))
 
 
 @app.route("/scheme_page")
 def scheme_page():
-    full_filename_before = "/static/img/uploads/" + last_file
-    full_filename = "/static/img/schemes/" + last_file
+    full_filename_before = "/static/img/uploads/" + get_filename()
+    full_filename = "/static/img/schemes/" + get_filename()
+    palette_path = "/static/img/palettes/" + get_filename()
     return render_template('schemepage.html', user_image=full_filename,
-                           before=full_filename_before)
-
-# ___________________________Computing_part____________________________ #
-CONST_EPSILON = 20.0
-CONST_PALETTE = {"standard": [(0, 0, 0),
-                              (128, 128, 128),
-                              (192, 192, 192),
-                              (255, 255, 255),
-                              (128, 0, 0),
-                              (255, 0, 0),
-                              (128, 128, 0),
-                              (255, 255, 0),
-                              (0, 128, 0),
-                              (0, 255, 0),
-                              (0, 128, 128),
-                              (0, 255, 255),
-                              (0, 0, 128),
-                              (0, 0, 255),
-                              (128, 0, 128),
-                              (255, 0, 255)]}
+                           before=full_filename_before, palette=palette_path)
 
 
-def distance(pixel, basic_colour):
-    return numpy.linalg.norm(numpy.array(pixel) - numpy.array(basic_colour))
+@app.route("/error_page")
+def error_page():
+    return render_template('errorpage.html')
 
 
-def handle_pixel(pixel, palette="standard"):
-    distances = [(distance(pixel, basic_colour), basic_colour)
-                 for basic_colour in CONST_PALETTE[palette]]
-    distances.sort()
-    probably_colour = [dist[1] for dist in distances
-                       if abs(distances[0][0] - dist[0]) < CONST_EPSILON]
-    return choices(probably_colour)[0]
+@app.route("/scheme_page/download", methods=['GET', 'POST'])
+def download_file():
+    create_sending_file()
+    return send_file(PDF_PATH + get_filename('.pdf'), as_attachment=True)
 
 
-def convert_image(filename):
-    source_image = Image.open(app.config["IMAGE_UPLOADS"] + filename)
-
-    numpy_im = numpy.array(source_image)
-    width, height, depth = numpy_im.shape
-
-    for i in range(width):
-        for c in range(height):
-            numpy_im[i][c] = handle_pixel(numpy_im[i][c])
-
-    new_image = Image.fromarray(numpy_im)
-    new_image.save(os.path.join(app.config["SCHEMES"], filename))
+@app.after_request
+def add_header(response):
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)

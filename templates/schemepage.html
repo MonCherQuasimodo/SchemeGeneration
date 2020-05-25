@@ -4,15 +4,22 @@
 <head>
   <meta charset="utf-8">
   <title>schemegen</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 </head>
 
 <body>
 
     <h1>Scheme page</h1>
+    <a href="/">Back</a>
     <h2>Image</h2>
     <img src="{{ before }}" alt="User Image"><br>
     <h2>Scheme</h2>
-    <img src="{{ user_image }}" alt="User Image">
-
+    <form action="/scheme_page/download" method="POST" enctype="multipart/form-data">
+        <button type="submit" class="button_submit">Download!</button>
+    </form>
+    <img src="{{ palette }}" alt="Palette"><br>
+    <img src="{{ user_image }}" alt="User Image"><br>
 </body>
 </html>

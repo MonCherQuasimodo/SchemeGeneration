@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -8,16 +7,49 @@
 
 <body>
     <h1>Main page</h1>
-
     <form action="/upload_image" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label>Select image</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" name="image" id = "image">
-            </div>
+            <div class="file">
+                <input type="file" class="image_input" name="image" id="image">
+            </div><br><br>
+            <label>Diagonal size (cm):</label>
+            <div class="diagonal">
+                <select name="diagonal">
+                    <option>5</option>
+                    <option>10</option>
+                    <option>15</option>
+                    <option>20</option>
+                    <option>25</option>
+                    <option selected>30</option>
+                    <option>35</option>
+                    <option>40</option>
+                </select>
+            </div><br><br>
+            <label>Density (cells per cm):</label>
+            <div class="density">
+                <select name="density">
+                    <option>3.1</option>
+                    <option>3.9</option>
+                    <option selected>4.7</option>
+                    <option>5.5</option>
+                </select>
+            </div><br><br>
+            <label>Palette:</label>
+            <div class="palette">
+                <select name="palette">
+                    <option>Standard</option>
+                </select>
+            </div><br><br>
+            <label>Mod:</label>
+            <div class="mod">
+                <select name="mod">
+                    <option>Fast</option>
+                    <option selected>High-quality</option>
+                </select>
+            </div><br><br>
         </div>
-        <button type="submit" class="btn btn-primary">Upload image</button>
+        <button type="submit" class="button_submit">Generate scheme!</button>
     </form>
-
 </body>
 </html>
