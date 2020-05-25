@@ -10,6 +10,7 @@ from PIL import Image
 from fpdf import FPDF
 
 import matplotlib.pyplot as plt
+import traceback
 
 from random import choices
 
@@ -78,6 +79,7 @@ def upload_image():
                                     fig)
             except Exception as e:
                 print(e, file=sys.stderr)
+                traceback.print_exc()
                 return redirect(url_for('error_page'))
             return redirect(request.url)
     return redirect(url_for('scheme_page'))
