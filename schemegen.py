@@ -76,7 +76,8 @@ def upload_image():
                                     float(request.form.get('density')),
                                     request.form.get('mod'),
                                     fig)
-            except:
+            except Exception as e:
+                print(e, file=sys.stderr)
                 return redirect(url_for('error_page'))
             return redirect(request.url)
     return redirect(url_for('scheme_page'))
