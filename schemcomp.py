@@ -78,7 +78,7 @@ def fast_mod(source_image, palette):
 def add_grid(source_image, pixel_per_cell_value):
     fig = plt.figure(figsize=(float(source_image.size[0])/DPI,
                               float(source_image.size[1])/DPI),
-                              dpi=DPI)
+                     dpi=DPI)
 
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax = fig.add_subplot(111)
@@ -126,7 +126,7 @@ def computing(filename, size=30, palette='standard',
 
     # Возвращаем исходный размер картинкe
     source_image = source_image.resize((width_cell * pixel_per_cell_value,
-                                        height_cell * pixel_per_cell_value))
+                                       height_cell * pixel_per_cell_value))
     # Рисуем клеточки
     fig = add_grid(source_image, pixel_per_cell_value)
 

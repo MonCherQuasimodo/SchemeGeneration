@@ -9,10 +9,6 @@ from PIL import Image
 
 from fpdf import FPDF
 
-import matplotlib
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 import traceback
 import uuid
 
@@ -22,6 +18,11 @@ import os
 import sys
 
 import schemcomp
+
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
@@ -38,9 +39,10 @@ IMAGE_NAME = 'IMAGE_'
 
 cur_file_name = ''
 
+
 def get_filename(ext=None):
-    return (cur_file_name if ext == None
-                          else os.path.splitext(cur_file_name)[0] + ext)
+    return (cur_file_name if ext is None
+            else os.path.splitext(cur_file_name)[0] + ext)
 
 
 def create_sending_file():
