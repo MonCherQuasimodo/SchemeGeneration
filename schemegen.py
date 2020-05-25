@@ -11,6 +11,7 @@ from fpdf import FPDF
 
 import matplotlib.pyplot as plt
 import traceback
+import uuid
 
 from random import choices
 
@@ -30,19 +31,14 @@ PATHS = {
 PDF_PATH = os.getcwd() + "/static/pdf/"
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
 IMAGE_NAME = 'IMAGE_'
 
-id = 0
-ext = ""
-
+cur_file_name = ''
 fig = plt.figure()
 
-
-def get_filename(extension='native'):
-    filename = IMAGE_NAME + str(id)
-    filename += ext if extension == 'native' else extension
-    return filename
+def get_filename(ext=None):
+    return (cur_file_name if ext == None
+                          else os.path.splitext(cur_file_name)[0] + ext)
 
 
 def create_sending_file():
@@ -64,10 +60,9 @@ def upload_image():
     if request.method == "POST":
         if request.files:
             image = request.files['image']
-            global id
+            global cur_file_name
             global ext
-            ext = os.path.splitext(image.filename)[1]
-            id += 1
+            cur_file_name = str(uuid.uuid4()) + os.path.splitext(image.filename)[1]
             image.save(os.path.join(PATHS["IMAGE_UPLOADS"],
                                     get_filename()))
             try:
@@ -110,6 +105,7 @@ def add_header(response):
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
     response.headers['Cache-Control'] = 'public, max-age=0'
     return response
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)

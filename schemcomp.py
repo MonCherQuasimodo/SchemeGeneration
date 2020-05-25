@@ -128,7 +128,7 @@ def computing(filename, size=30, palette='standard',
                                         height_cell * pixel_per_cell_value))
     # Рисуем клеточки
     add_grid(source_image, pixel_per_cell_value, fig)
-
+    
     # Вывод
     output_image(fig, filename)
     fig.clear()
@@ -150,14 +150,15 @@ def create_color_table(filename, palette='standard'):
                       color='white')
     table = ImageOps.expand(table, border=3, fill='black')
     draw = ImageDraw.Draw(table)
-    for i in range(len(CONST_PALETTE[palette])):
-        cell = get_cell_color(CONST_PALETTE[palette][i])
-        table.paste(cell, (30, 20 + i * 40))
+    for ind, color in enumerate(CONST_PALETTE[palette]):
+        cell = get_cell_color(color)
+        table.paste(cell, (30, 20 + ind * 40))
         font = ImageFont.truetype("arial.ttf", 15)
-        draw.text((80, 30 + i * 40),
+        draw.text((80, 30 + ind * 40),
                   '#Number in company palette  ' +
-                  str(CONST_PALETTE[palette][i]), (0, 0, 0), font)
+                  str(color), (0, 0, 0), font)
     table.save(PALETTES + filename)
+
 
 '''
 if __name__ == "__main__":
