@@ -9,6 +9,9 @@ from PIL import Image
 
 from fpdf import FPDF
 
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import traceback
 import uuid
@@ -34,7 +37,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 IMAGE_NAME = 'IMAGE_'
 
 cur_file_name = ''
-fig = plt.figure()
 
 def get_filename(ext=None):
     return (cur_file_name if ext == None
@@ -70,8 +72,7 @@ def upload_image():
                                     int(request.form.get('diagonal')),
                                     request.form.get('palette').lower(),
                                     float(request.form.get('density')),
-                                    request.form.get('mod'),
-                                    fig)
+                                    request.form.get('mod'))
             except Exception as e:
                 print(e, file=sys.stderr)
                 traceback.print_exc()

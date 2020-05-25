@@ -75,10 +75,10 @@ def fast_mod(source_image, palette):
     return Image.fromarray(numpy_im)
 
 
-def add_grid(source_image, pixel_per_cell_value, fig):
-    fig.set_figwidth(float(source_image.size[0])/DPI)
-    fig.set_figheight(float(source_image.size[1])/DPI)
-    fig.set_dpi(DPI)
+def add_grid(source_image, pixel_per_cell_value):
+    fig = plt.figure(figsize=(float(source_image.size[0])/DPI,
+                              float(source_image.size[1])/DPI),
+                              dpi=DPI)
 
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax = fig.add_subplot(111)
@@ -87,6 +87,7 @@ def add_grid(source_image, pixel_per_cell_value, fig):
     ax.yaxis.set_major_locator(loc)
     ax.grid(which='major', axis='both', linestyle='-', )
     ax.imshow(source_image)
+    return fig
 
 
 def input_image(filename):
@@ -98,7 +99,7 @@ def output_image(fig, filename):
 
 
 def computing(filename, size=30, palette='standard',
-              density=5.1, mod='High-quality', fig=plt.figure()):
+              density=5.1, mod='High-quality'):
     # Ввод
     source_image = input_image(filename)
 
@@ -127,11 +128,11 @@ def computing(filename, size=30, palette='standard',
     source_image = source_image.resize((width_cell * pixel_per_cell_value,
                                         height_cell * pixel_per_cell_value))
     # Рисуем клеточки
-    add_grid(source_image, pixel_per_cell_value, fig)
-    
+    fig = add_grid(source_image, pixel_per_cell_value)
+
     # Вывод
     output_image(fig, filename)
-    fig.clear()
+    plt.close(fig)
 
     # Таблица цветов
     # Для каждого файла своя, так как некоторые цвета могут не
